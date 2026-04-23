@@ -1,0 +1,1 @@
+SECRET_KEY = "your-secret-key-here"  # Change this to a strong secret key

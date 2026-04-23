@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ComplyAI</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #0f172a;
+            color: white;
+            padding: 20px;
+        }
+
+        .box {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        input, select {
+            padding: 8px;
+            margin: 5px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        button {
+            background: #3b82f6;
+            padding: 10px;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+
+        .hidden { display: none; }
+
+        .cta {
+            background: #020617;
+            padding: 15px;
+            text-align: center;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>🚀 ComplyAI Platform</h1>
+
+<!-- AUTH -->
+<div class="box" id="authBox">
+    <h3>Login / Signup</h3>
+    <input id="email" placeholder="Email"><br>
+    <input id="password" type="password" placeholder="Password"><br><br>
+
+    <button onclick="signup()">Signup</button>
+    <button onclick="login()">Login</button>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
+
+<div class="box">
+    <input type="file" id="file"><br><br>
+
+    <select id="framework">
+        <option value="iso27001">ISO 27001</option>
+        <option value="soc2">SOC 2</option>
+    </select>
+
+    <select id="mode">
+        <option value="compliance">Compliance</option>
+        <option value="risk">Risk</option>
+        <option value="audit">Audit</option>
+    </select>
+
+    <button onclick="run()">Run Analysis</button>
+</div>
+
+<div class="box">
+    <canvas id="chart"></canvas>
+</div>
+
+<div class="box">
+    <h3>Summary</h3>
+    <div id="summary">Waiting...</div>
+</div>
+
+<div class="box">
+    <h3>Risks</h3>
+    <div id="risks">Waiting...</div>
+</div>
+
+<div class="box">
+    <h3>Recommendations</h3>
+    <div id="recommendations">Waiting...</div>
+</div>
+
+<div class="cta" id="paywall" style="display:none;">
+    <p>🔒 Unlock full report</p>
+    <a href="https://your-stripe-link" target="_blank">
+        <button>Upgrade</button>
+    </a>
+</div>
+
+<div class="box">
+    <button onclick="downloadPDF()">Download PDF</button>
+</div>
+
+</div>
+
+<script>
+let token = localStorage.getItem("token");
+
+// Auto login if token exists
+if (token) {
+    document.getElementById("authBox").style.display = "none";
+    document.getElementById("app").classList.remove("hidden");
+}
+
+// ✅ FIXED SIGNUP (JSON BODY)
+async function signup() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    const res = await fetch("http://127.0.0.1:8000/signup", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            email: email,
+            password: password
+        })
+    });
+
+    const data = await res.json();
+    alert(data.message || "Signup done");
+}
+
+// ✅ FIXED LOGIN (JSON BODY)
+async function login() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    const res = await fetch("http://127.0.0.1:8000/login", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            email: email,
+            password: password
+        })
+    });
+
+    const data = await res.json();
+
+    if (data.access_token) {
+        token = data.access_token;
+        localStorage.setItem("token", token);
+
+        document.getElementById("authBox").style.display = "none";
+        d…
